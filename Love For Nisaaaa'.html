@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nisaa' I Love youu — I Love You</title>
+  <style>
+    :root{
+      --bg: #fff0f6;
+      --card: #fff;
+      --primary: #ff4d6d;
+      --accent: #ff9bb3;
+      --text: #4b2b2b;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+      font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(circle at 10% 10%, rgba(255,200,220,0.35), transparent 10%), var(--bg);
+      color:var(--text);
+      transition:background .4s ease;
+    }
+
+    .card{
+      width:min(880px,94vw);padding:28px;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85));
+      box-shadow:0 10px 30px rgba(0,0,0,0.08);display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:center;
+    }
+
+    .left{display:flex;flex-direction:column;gap:16px}
+    .title{font-size:28px;font-weight:700;letter-spacing:0.02em}
+    .subtitle{font-size:14px;color:rgba(0,0,0,0.45)}
+
+    .center{
+      display:flex;align-items:center;gap:18px
+    }
+
+    /* Heart */
+    .heart-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+    .heart{
+      width:160px;height:160px;position:relative;cursor:pointer;user-select:none;display:inline-block;
+      transform-origin:center center;transition:transform .2s ease;
+    }
+    .heart:active{transform:scale(.98)}
+
+    .heart-shape{
+      position:absolute;inset:0;background:var(--primary);border-radius:50% 50% 50% 50%;
+      transform:rotate(-45deg) translateY(-8%);
+      box-shadow:0 6px 20px rgba(0,0,0,0.12);
+      transition:transform .3s ease, box-shadow .3s ease, background .3s ease;
+      display:flex;align-items:center;justify-content:center;
+    }
+
+    .heart-shape::before, .heart-shape::after{
+      content:'';position:absolute;width:100%;height:100%;border-radius:50%;background:var(--primary);
+    }
+    .heart-shape::before{top:-50%}
+    .heart-shape::after{left:50%;transform:translateX(-50%)}
+
+    /* pulsing animation */
+    .heart.animate .heart-shape{
+      animation: pulse 1s infinite cubic-bezier(.33,.66,.66,1);
+    }
+    @keyframes pulse{
+      0%{transform:scale(1) rotate(-45deg)}
+      50%{transform:scale(1.08) rotate(-45deg)}
+      100%{transform:scale(1) rotate(-45deg)}
+    }
+
+    /* floating hearts container */
+    .sky{position:relative;height:260px;overflow:hidden}
+    .floating-heart{
+      position:absolute;bottom:30px;left:50%;width:36px;height:36px;transform:translateX(-50%);pointer-events:none;
+      animation: floatUp 2.2s ease forwards;opacity:0.95;font-size:20px;display:grid;place-items:center;
+    }
+    @keyframes floatUp{
+      0%{transform:translateX(-50%) translateY(0) scale(0.9);opacity:1}
+      100%{transform:translateX(calc(-50% + var(--x))) translateY(-380px) scale(1.1);opacity:0}
+    }
+
+    /* Controls */
+    .controls{display:flex;flex-direction:column;gap:12px;padding:8px}
+    button{padding:10px 14px;border-radius:10px;border:0;background:var(--primary);color:white;font-weight:600;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,0.08)}
+    button.secondary{background:transparent;color:var(--primary);border:1px solid rgba(0,0,0,0.06)}
+
+    .theme-indicator{display:flex;gap:8px;align-items:center}
+    .color-dot{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 -3px 6px rgba(0,0,0,0.06)}
+
+    .editable{
+      font-size:48px;font-weight:800;line-height:1;cursor:text;padding:6px 8px;background:transparent;border-radius:8px;display:inline-block
+    }
+    .editable[contenteditable]:focus{outline:2px dashed rgba(0,0,0,0.08);}
+
+    /* responsive */
+    @media (max-width:760px){
+      .card{grid-template-columns:1fr;}
+      .heart{width:120px;height:120px}
+      .sky{height:180px}
+      .editable{font-size:36px}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <div class="left">
+      <div>
+        <div class="title">Untuk Khoirun Nisa' Putri Maharani</div>
+        <div class="subtitle">Klik hati untuk memicu animasi. Tekan teks "i love you" untuk mengubah kata-katanya.</div>
+      </div>
+
+      <div class="center">
+        <div class="heart-wrap">
+          <div class="sky" id="sky">
+            <div class="heart" id="heart" title="Klik untuk cinta!" role="button" aria-pressed="false">
+              <div class="heart-shape" id="heartShape"></div>
+            </div>
+          </div>
+
+          <div style="text-align:center">
+            <div contenteditable="true" id="loveText" class="editable" aria-label="Ubah teks cinta">i love you</div>
+            <div style="font-size:12px;color:rgba(0,0,0,0.45);margin-top:6px">(ketik untuk mengubah, klik di luar untuk menyimpan)</div>
+          </div>
+        </div>
+
+        <div style="flex:1">
+          <p>Semangat yaa Nisa', Jangan lupa makan, Nanti kalau udah selesai kumpul pulangnya hati-hati yaaaaaaa.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <button id="toggleAnim">Toggle Pulse</button>
+            <button class="secondary" id="burst">Buat Burst</button>
+            <button id="themeBtn">Ganti Tema</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="controls" aria-label="Kontrol tema">
+      <div class="theme-indicator">
+        <div class="color-dot" id="dot" style="background:var(--primary)"></div>
+        <div>Warna utama sekarang</div>
+      </div>
+      <div style="font-size:13px;color:rgba(0,0,0,0.55)">Jangan Lupa Foto nya Di kirim Okeeeee.</div>
+      <div style="margin-top:6px">
+        <button id="downloadBtn" class="secondary">Download sebagai PNG</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // Themes: array of theme objects
+    const themes = [
+      {bg:'#fff0f6', primary:'#ff4d6d', accent:'#ff9bb3', card:'#fff', text:'#4b2b2b'},
+      {bg:'#fff9f0', primary:'#ff8a65', accent:'#ffd1b3', card:'#fff', text:'#3b2b20'},
+      {bg:'#f5f2ff', primary:'#8b5cf6', accent:'#cdb8ff', card:'#fff', text:'#2a203a'},
+      {bg:'#f0fff6', primary:'#16a34a', accent:'#a8f3c7', card:'#fff', text:'#15331d'}
+    ];
+
+    let themeIndex = 0;
+    const themeBtn = document.getElementById('themeBtn');
+    const heart = document.getElementById('heart');
+    const heartShape = document.getElementById('heartShape');
+    const sky = document.getElementById('sky');
+    const toggleAnim = document.getElementById('toggleAnim');
+    const burst = document.getElementById('burst');
+    const dot = document.getElementById('dot');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    function applyTheme(i){
+      const t = themes[i];
+      document.documentElement.style.setProperty('--bg', t.bg);
+      document.documentElement.style.setProperty('--primary', t.primary);
+      document.documentElement.style.setProperty('--accent', t.accent);
+      document.documentElement.style.setProperty('--card', t.card);
+      document.documentElement.style.setProperty('--text', t.text);
+      dot.style.background = t.primary;
+    }
+
+    themeBtn.addEventListener('click', ()=>{
+      themeIndex = (themeIndex+1) % themes.length; applyTheme(themeIndex);
+    });
+
+    // Toggle pulse animation on heart
+    let pulsing = true; heart.classList.add('animate'); heart.setAttribute('aria-pressed','true');
+    toggleAnim.addEventListener('click', ()=>{
+      pulsing = !pulsing; heart.classList.toggle('animate', pulsing); heart.setAttribute('aria-pressed', pulsing.toString());
+      toggleAnim.textContent = pulsing ? 'Nonaktifkan Pulse' : 'Aktifkan Pulse';
+    });
+
+    // Clicking the heart creates a small floating heart and a little scale effect
+    heart.addEventListener('click', (e)=>{
+      triggerBurst(e.clientX, e.clientY, 8);
+      heartAnimateClick();
+    });
+
+    burst.addEventListener('click', ()=>{ triggerBurst(window.innerWidth/2, window.innerHeight/2, 18)});
+
+    function heartAnimateClick(){
+      heart.style.transform = 'scale(1.06)';
+      setTimeout(()=>heart.style.transform = '', 160);
+    }
+
+    // create floating hearts
+    function triggerBurst(x, y, count=12){
+      for(let i=0;i<count;i++){
+        const el = document.createElement('div');
+        el.className = 'floating-heart';
+        // random offset
+        const left = (Math.random()*160 - 80) + 'px';
+        el.style.setProperty('--x', left);
+        el.style.left = (Math.random()*80 + 10) + '%';
+        el.style.bottom = (Math.random()*20 + 30) + 'px';
+        el.innerHTML = '❤';
+        el.style.fontSize = (10 + Math.random()*26) + 'px';
+        sky.appendChild(el);
+        // remove after animation
+        setTimeout(()=>{ el.remove(); }, 2400 + Math.random()*300);
+      }
+    }
+
+    // allow pressing Enter to finish editing
+    const loveText = document.getElementById('loveText');
+    loveText.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ e.preventDefault(); loveText.blur(); }
+    });
+
+    // download screenshot (simple): use html2canvas like functionality is not available; use SVG export
+    downloadBtn.addEventListener('click', ()=>{
+      // create simple SVG snapshot of center card
+      const rect = document.querySelector('.card').getBoundingClientRect();
+      const text = loveText.textContent.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      const svg = `<?xml version=\"1.0\" encoding=\"UTF-8\"?><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${Math.round(rect.width)}\" height=\"${Math.round(rect.height)}\">`+
+        `<rect width=\"100%\" height=\"100%\" rx=\"18\" fill=\"${getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()}\"/>`+
+        `<text x=\"50%\" y=\"48%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"48\" fill=\"${getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()}\" font-family=\"Arial, Helvetica, sans-serif\">${text}</text>`+
+        `</svg>`;
+      const blob = new Blob([svg],{type:'image/svg+xml'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'i-love-you.svg'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // initial theme
+    applyTheme(themeIndex);
+
+    // keyboard shortcut: space to burst
+    window.addEventListener('keydown', (e)=>{ if(e.code === 'Space'){ e.preventDefault(); triggerBurst(window.innerWidth/2, window.innerHeight/2, 14);} });
+  </script>
+</body>
+</html>
+
